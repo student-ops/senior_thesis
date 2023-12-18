@@ -1,0 +1,6 @@
+t*.env
+.env.local
+envfile
+**/grafana_volume
+
+**/build/main
