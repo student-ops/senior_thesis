@@ -4,4 +4,5 @@ envfile
 **/grafana_volume
 
 **/build/main
-mosqquito
+mosqquito/data
+mosqquito/log
