@@ -1,0 +1,10 @@
+version: "3.7"
+services:
+    mosquitto:
+      image: eclipse-mosquitto:latest
+      ports:
+        - 1883:1883
+      volumes:
+        - ./mosqquito/conf:/mosquitto/config
+        - ./mosqquito/data:/mosquitto/data
+        - ./mosqquito/log:/mosquitto/log
