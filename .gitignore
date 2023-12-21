@@ -1,4 +1,4 @@
-t*.env
+**/*.env*
 .env.local
 envfile
 **/grafana_volume
