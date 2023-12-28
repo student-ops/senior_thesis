@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: telegraf-influxdb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: telegraf-influxdb
+  template:
+    metadata:
+      labels:
+        app: telegraf-influxdb
+    spec:
+      containers:
+        - name: telegraf
+          image: telegraf:latest
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/telegraf
+
+        - name: influxdb
+          image: influxdb:latest
+          ports:
+            - containerPort: 8086
+          env:
+            - name: DOCKER_INFLUXDB_INIT_MODE
+              value: "setup"
+            - name: DOCKER_INFLUXDB_INIT_USERNAME
+              value: "user"
+            - name: DOCKER_INFLUXDB_INIT_PASSWORD
+              value: "password"
+            - name: DOCKER_INFLUXDB_INIT_ORG
+              value: "some_org"
+            - name: DOCKER_INFLUXDB_INIT_BUCKET
+              value: "some_data"
+            - name: DOCKER_INFLUXDB_INIT_ADMIN_TOKEN
+              value: "4eYvsu8wZCJ6tKuE2sxvFHkvYFwSMVK0011hEEiojvejzpSaij86vYQomN_12au6eK-2MZ6Knr-Sax201y70w=="
+        - name: mosquitto
+          image: eclipse-mosquitto:latest
+          ports:
+            - containerPort: 1883
+          volumeMounts:
+            - name: mosqquito-config-volume
+              mountPath: /mosquitto/config
+      volumes:
+        - name: config-volume
+          configMap:
+            name: telegraf-config
+        - name: mosqquito-config-volume
+          configMap:
+            name: mosquitto-config
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mosquitto-config
+data:
+  mosquitto.conf: |
+    listener 1883
+    allow_anonymous true
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: telegraf-influxdb-service
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8086
+      targetPort: 8086
+  selector:
+    app: telegraf-influxdb

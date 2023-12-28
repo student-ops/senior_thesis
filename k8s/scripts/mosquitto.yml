@@ -1,3 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mosquitto-config
+data:
+  mosquitto.conf: |
+    listener 1883
+    allow_anonymous true
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -19,6 +28,13 @@ spec:
           image: eclipse-mosquitto:latest
           ports:
             - containerPort: 1883
+          volumeMounts:
+            - name: config-volume
+              mountPath: /mosquitto/config
+      volumes:
+        - name: config-volume
+          configMap:
+            name: mosquitto-config
 ---
 apiVersion: v1
 kind: Service
